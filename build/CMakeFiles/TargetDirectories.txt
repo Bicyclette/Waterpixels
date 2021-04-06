@@ -1,0 +1,4 @@
+/home/bicyclette/M1_IMA/Waterpixels/build/CMakeFiles/rebuild_cache.dir
+/home/bicyclette/M1_IMA/Waterpixels/build/CMakeFiles/edit_cache.dir
+/home/bicyclette/M1_IMA/Waterpixels/build/CMakeFiles/Waterpixels.dir
+/home/bicyclette/M1_IMA/Waterpixels/build/CMakeFiles/Waterpixels_autogen.dir

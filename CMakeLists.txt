@@ -1,0 +1,60 @@
+cmake_minimum_required(VERSION 3.18)
+
+project(Waterpixels)
+
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED_ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
+
+if(CMAKE_VERSION VERSION_LESS "3.7.0")
+	set(CMAKE_INCLUDE_CURRENT_DIR ON)
+endif()
+
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
+set(SRCS
+	src/main.cpp
+	src/window.cpp
+	src/clprogram.cpp)
+
+set(HEADERS
+	include/window.hpp
+	include/clprogram.hpp)
+
+add_executable(${PROJECT_NAME} ${SRCS} ${HEADERS})
+
+find_package(OpenMP REQUIRED)
+if(OPENMP_FOUND)
+	target_link_libraries(${PROJECT_NAME} ${OpenMP_LD_FLAGS})
+else()
+	message(FATAL_ERROR "OpenMP not found")
+endif()
+
+find_package(OPENCL REQUIRED)
+if(OPENCL_FOUND)
+	target_include_directories(${PROJECT_NAME} PUBLIC ${OPENCL_INCLUDE_DIRS})
+	target_link_libraries(${PROJECT_NAME} ${OPENCL_LIBRARIES})
+else()
+	message(FATAL_ERROR "OpenCL not found")
+endif()
+
+find_package(OpenCV REQUIRED)
+if(OpenCV_FOUND)
+	target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS})
+	target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+else()
+	message(FATAL_ERROR "OpenCV not found")
+endif()
+
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets; Qt5::Core)
