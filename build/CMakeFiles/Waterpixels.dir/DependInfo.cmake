@@ -4,10 +4,10 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/bicyclette/M1_IMA/Waterpixels/build/Waterpixels_autogen/mocs_compilation.cpp" "/home/bicyclette/M1_IMA/Waterpixels/build/CMakeFiles/Waterpixels.dir/Waterpixels_autogen/mocs_compilation.cpp.o"
-  "/home/bicyclette/M1_IMA/Waterpixels/src/clprogram.cpp" "/home/bicyclette/M1_IMA/Waterpixels/build/CMakeFiles/Waterpixels.dir/src/clprogram.cpp.o"
-  "/home/bicyclette/M1_IMA/Waterpixels/src/main.cpp" "/home/bicyclette/M1_IMA/Waterpixels/build/CMakeFiles/Waterpixels.dir/src/main.cpp.o"
-  "/home/bicyclette/M1_IMA/Waterpixels/src/window.cpp" "/home/bicyclette/M1_IMA/Waterpixels/build/CMakeFiles/Waterpixels.dir/src/window.cpp.o"
+  "/home/mathias/M1_IMA/PIMA/Waterpixels/build/Waterpixels_autogen/mocs_compilation.cpp" "/home/mathias/M1_IMA/PIMA/Waterpixels/build/CMakeFiles/Waterpixels.dir/Waterpixels_autogen/mocs_compilation.cpp.o"
+  "/home/mathias/M1_IMA/PIMA/Waterpixels/src/clprogram.cpp" "/home/mathias/M1_IMA/PIMA/Waterpixels/build/CMakeFiles/Waterpixels.dir/src/clprogram.cpp.o"
+  "/home/mathias/M1_IMA/PIMA/Waterpixels/src/main.cpp" "/home/mathias/M1_IMA/PIMA/Waterpixels/build/CMakeFiles/Waterpixels.dir/src/main.cpp.o"
+  "/home/mathias/M1_IMA/PIMA/Waterpixels/src/window.cpp" "/home/mathias/M1_IMA/PIMA/Waterpixels/build/CMakeFiles/Waterpixels.dir/src/window.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -23,12 +23,11 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "Waterpixels_autogen/include"
   "../include"
   "/usr/local/cuda/include"
-  "/usr/include/opencv4"
-  "/usr/include/qt5"
-  "/usr/include/qt5/QtWidgets"
-  "/usr/include/qt5/QtGui"
-  "/usr/include/qt5/QtCore"
-  "/usr/lib64/qt5/mkspecs/linux-g++"
+  "/usr/include/x86_64-linux-gnu/qt5"
+  "/usr/include/x86_64-linux-gnu/qt5/QtWidgets"
+  "/usr/include/x86_64-linux-gnu/qt5/QtGui"
+  "/usr/include/x86_64-linux-gnu/qt5/QtCore"
+  "/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++"
   )
 
 # Targets to which this target links.

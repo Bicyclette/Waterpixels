@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 
 project(Waterpixels)
 
@@ -21,6 +21,7 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(/usr/local/cuda/include/)
 
 set(SRCS
 	src/main.cpp
@@ -46,14 +47,6 @@ if(OPENCL_FOUND)
 	target_link_libraries(${PROJECT_NAME} ${OPENCL_LIBRARIES})
 else()
 	message(FATAL_ERROR "OpenCL not found")
-endif()
-
-find_package(OpenCV REQUIRED)
-if(OpenCV_FOUND)
-	target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS})
-	target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
-else()
-	message(FATAL_ERROR "OpenCV not found")
 endif()
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
