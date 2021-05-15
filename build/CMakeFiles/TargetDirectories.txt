@@ -1,4 +1,0 @@
-/home/mathias/M1_IMA/PIMA/Waterpixels/build/CMakeFiles/rebuild_cache.dir
-/home/mathias/M1_IMA/PIMA/Waterpixels/build/CMakeFiles/edit_cache.dir
-/home/mathias/M1_IMA/PIMA/Waterpixels/build/CMakeFiles/Waterpixels.dir
-/home/mathias/M1_IMA/PIMA/Waterpixels/build/CMakeFiles/Waterpixels_autogen.dir
