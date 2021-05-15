@@ -124,7 +124,7 @@ Waterpixels: CMakeFiles/Waterpixels.dir/src/main.cpp.o
 Waterpixels: CMakeFiles/Waterpixels.dir/src/window.cpp.o
 Waterpixels: CMakeFiles/Waterpixels.dir/src/clprogram.cpp.o
 Waterpixels: CMakeFiles/Waterpixels.dir/build.make
-Waterpixels: /usr/lib/x86_64-linux-gnu/libOpenCL.so
+Waterpixels: /usr/local/cuda/lib64/libOpenCL.so
 Waterpixels: /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.12.8
 Waterpixels: /usr/lib/x86_64-linux-gnu/libQt5Gui.so.5.12.8
 Waterpixels: /usr/lib/x86_64-linux-gnu/libQt5Core.so.5.12.8

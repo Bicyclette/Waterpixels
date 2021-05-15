@@ -11,7 +11,7 @@ Window::Window() :
 	grid.distanceFromMarkersItem = nullptr;
 	img.gradientItem = nullptr;
 	img.regularizedGradientItem = nullptr;
-	img.contoursItem = nullptr;
+	img.resultItem = nullptr;
 
 	scene = new QGraphicsScene;
 	view = new QGraphicsView(scene);
@@ -114,10 +114,10 @@ void Window::resetImageData()
 		delete[] grid.distanceFromMarkersRAW;
 	}
 
-	if(img.contoursItem != nullptr)
+	if(img.resultItem != nullptr)
 	{
-		scene->removeItem(img.contoursItem);
-		img.contoursItem = nullptr;
+		scene->removeItem(img.resultItem);
+		img.resultItem = nullptr;
 	}
 }
 
@@ -255,6 +255,7 @@ void Window::openImg()
 		grid.markers = img.original;
 		grid.distanceFromMarkers = img.original;
 		img.regularizedGradient = img.original;
+		img.result = img.original;
 		img.contours = img.original;
 
 		img.smooth.fill(QColor(0, 0, 0, 255));
@@ -263,7 +264,8 @@ void Window::openImg()
 		grid.markers.fill(QColor(0, 0, 0, 0));
 		grid.distanceFromMarkers.fill(QColor(0, 0, 0, 255));
 		img.regularizedGradient.fill(QColor(0, 0, 0, 255));
-		img.contours.fill(QColor(0, 0, 0, 0));
+		img.result.fill(QColor(0, 0, 0, 0));
+		img.contours.fill(QColor(0, 0, 0, 255));
 
 		// set size of unsigned char arrays
 		img.smoothRAW = std::make_unique<unsigned char[]>(img.width * img.height * 3);
@@ -334,10 +336,16 @@ void Window::saveDoc()
 	{
 		QMessageBox::warning(this, "Error", "Contours image could not be saved.");
 	}
+	if(!img.result.save(root + QString("/result.jpg")))
+	{
+		QMessageBox::warning(this, "Error", "Result image could not be saved.");
+	}
 }
 
 void Window::computeWaterpixels()
 {
+	start = omp_get_wtime();
+	
 	// smooth image
 	computeSmooth();
 	// compute lab gradient
@@ -350,6 +358,8 @@ void Window::computeWaterpixels()
 	computeRegularizedGradient();
 	// watershed
 	computeWatershed();
+	
+	std::cout<< "Computation time : " << end - start << " seconds." << std::endl;
 }
 
 void Window::showOriginalImage()
@@ -424,12 +434,12 @@ void Window::hideRegularizedGradient()
 
 void Window::showContours()
 {
-	img.contoursItem->show();
+	img.resultItem->show();
 }
 
 void Window::hideContours()
 {
-	img.contoursItem->hide();
+	img.resultItem->hide();
 }
 
 void Window::computeSmooth()
@@ -969,78 +979,6 @@ int validSeed(const int startIndex, const int endIndex, const int seedIndex, std
 	return -1;
 }
 
-int growRegionIt(
-		const int width,
-		const int rootIndex,
-		const int startIndex,
-		const int endIndex,
-		std::vector<int>& indices,
-		unsigned char* gradient,
-		const int minGradient,
-		bool indexVisited[])
-{
-	// array of seeds (FIFO)
-	std::queue<int> seedIndex;
-	seedIndex.push(rootIndex);
-
-	int area{0};
-	int node;
-	int N; int S; int E; int W;
-	int NE; int NW; int SE; int SW;
-
-	while(seedIndex.size() > 0)
-	{
-		int index = seedIndex.front();
-		node = validSeed(startIndex, endIndex, index, indices);
-		if(node != -1 && gradient[index] == minGradient)
-		{
-			// surface increase
-			area++;
-				
-			// mark seed as visited
-			indexVisited[node - startIndex] = true;
-
-			// get surrounding nodes
-			N = index - (width*3);
-			S = index + (width*3);
-			E = index + 3;
-			W = index - 3;
-			NE = index - (width*3) + 3;
-			NW = index - (width*3) - 3;
-			SE = index + (width*3) + 3;
-			SW = index + (width*3) - 3;
-
-			// rewrite seedIndex array
-			node = validSeed(startIndex, endIndex, N, indices);
-			if(node != -1 && !indexVisited[node - startIndex])
-				seedIndex.push(N);
-			node = validSeed(startIndex, endIndex, S, indices);
-			if(node != -1 && !indexVisited[node - startIndex])
-				seedIndex.push(S);
-			node = validSeed(startIndex, endIndex, E, indices);
-			if(node != -1 && !indexVisited[node - startIndex])
-				seedIndex.push(E);
-			node = validSeed(startIndex, endIndex, W, indices);
-			if(node != -1 && !indexVisited[node - startIndex])
-				seedIndex.push(W);
-			node = validSeed(startIndex, endIndex, NE, indices);
-			if(node != -1 && !indexVisited[node - startIndex])
-				seedIndex.push(NE);
-			node = validSeed(startIndex, endIndex, NW, indices);
-			if(node != -1 && !indexVisited[node - startIndex])
-				seedIndex.push(NW);
-			node = validSeed(startIndex, endIndex, SE, indices);
-			if(node != -1 && !indexVisited[node - startIndex])
-				seedIndex.push(SE);
-			node = validSeed(startIndex, endIndex, SW, indices);
-			if(node != -1 && !indexVisited[node - startIndex])
-				seedIndex.push(SW);
-		}
-		seedIndex.pop();
-	}
-	return area;
-}
-
 void colorMaxRegion(
 		const int width,
 		const int seedIndex,
@@ -1378,7 +1316,14 @@ void Window::computeWatershed()
 		if(writeLabel)
 			img.labelsMap[index/3] = nLabel;
 	}
+	
+	// computation time end
+	end = omp_get_wtime();
 
+	float contour_density{0};
+	contour_density += static_cast<float>(img.width * 2);
+	contour_density += static_cast<float>(img.height * 2);
+	contour_density += 4.0f;
 	// write contours map
 	for(int i{0}; i < (img.width * img.height); ++i)
 	{
@@ -1387,8 +1332,11 @@ void Window::computeWatershed()
 			img.contoursRAW[i*3] = 255;
 			img.contoursRAW[i*3+1] = 255;
 			img.contoursRAW[i*3+2] = 255;
+			contour_density += 1.0f;
 		}
 	}
+	contour_density /= static_cast<float>(img.width * img.height);
+	std::cout << "CD = " << contour_density << std::endl;
 
 	// dilate borders
 	cl::Context context = program.getContext();
@@ -1454,9 +1402,25 @@ void Window::computeWatershed()
 			img.contoursRAW[i*3+2] = outline[i*3];
 		}
 	}
+	
+	// save contours
+	img.painter.begin(&img.contours);
+	for(int y{0}; y < img.height; ++y)
+	{
+		for(int x{0}; x < img.width; ++x)
+		{
+			index = 3 * (y * img.width + x);
+			if(img.contoursRAW[index] == 255)
+				img.painter.setPen(QColor(255, 255, 255, 255));
+			else
+				img.painter.setPen(QColor(0, 0, 0, 255));
+			img.painter.drawPoint(x, y);
+		}
+	}
+	img.painter.end();
 
 	// rewrite image
-	img.painter.begin(&img.contours);
+	img.painter.begin(&img.result);
 	int red;
 	int green;
 	int blue;
@@ -1480,48 +1444,15 @@ void Window::computeWatershed()
 	img.painter.end();
 	
 	// set contours item
-	if(img.contoursItem != nullptr)
+	if(img.resultItem != nullptr)
 	{
-		scene->removeItem(img.contoursItem);
-		img.contoursItem = nullptr;
+		scene->removeItem(img.resultItem);
+		img.resultItem = nullptr;
 	}
-	img.contoursItem = scene->addPixmap(img.contours);
-	img.contoursItem->setZValue(6);
+	img.resultItem = scene->addPixmap(img.result);
+	img.resultItem->setZValue(6);
 
 	// update layer actions state
 	showContoursAction->setEnabled(true);
 	hideContoursAction->setEnabled(true);
-}
-
-bool dichotomicSearch(int value, std::vector<int> & elements)
-{
-	bool found{false};
-	int start{0};
-	int end{elements.size() - 1};
-	int pivot{(start + end) / 2};
-	int e;
-	
-	while(start != end && (end - start) > 1)
-	{
-		pivot = (start + end) / 2;
-		e = elements.at(pivot);
-		if(e == value)
-		{
-			found = true;
-			break;
-		}
-		else if(e < value)
-			start = pivot;
-		else
-			end = pivot;
-	}
-
-	if(start == end && elements.at(start) == value)
-		found = true;
-	else if((end - start) == 1)
-	{
-		if(elements.at(start) == value || elements.at(end) == value)
-			found = true;
-	}
-	return found;
 }

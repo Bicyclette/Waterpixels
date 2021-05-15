@@ -23,6 +23,7 @@
 #include <set>
 #include <ctime>
 #include <cstdlib>
+#include <omp.h>
 
 struct Image
 {
@@ -33,12 +34,13 @@ struct Image
 	QPixmap gradient;
 	QPixmap regularizedGradient;
 	QPixmap contours;
+	QPixmap result;
 	
 	QGraphicsPixmapItem* originalItem;
 	QGraphicsPixmapItem* smoothItem;
 	QGraphicsPixmapItem* gradientItem;
 	QGraphicsPixmapItem* regularizedGradientItem;
-	QGraphicsPixmapItem* contoursItem;
+	QGraphicsPixmapItem* resultItem;
 
 	unsigned char* originalRAW;
 	std::unique_ptr<unsigned char[]> smoothRAW;
@@ -155,6 +157,9 @@ class Window : public QMainWindow
 
 		struct Image img;
 		struct Grid grid;
+
+		double start;
+		double end;
 };
 
 void computeCellMarkersThread(
@@ -182,16 +187,6 @@ int growRegion(
  */
 int validSeed(const int startIndex, const int endIndex, const int seedIndex, std::vector<int>& indices);
 
-int growRegionIt(
-			const int width,
-			const int rootIndex,
-			const int startIndex,
-			const int endIndex,
-			std::vector<int>& indices,
-			unsigned char* gradient,
-			const int minGradient,
-			bool indexVisited[]);
-
 void colorMaxRegion(
 				const int width,
 				const int seedIndex,
@@ -202,7 +197,5 @@ void colorMaxRegion(
 				const int minGradient,
 				unsigned char* markers,
 				bool indexVisited[]);
-
-bool dichotomicSearch(int value, std::vector<int> & elements);
 
 #endif
