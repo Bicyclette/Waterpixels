@@ -1112,9 +1112,10 @@ void Window::computeRegularizedGradient()
 	int red;
 	int green;
 	int blue;
-	for(int y{0}; y < img.height; ++y)
+	#pragma omp parallel for collapse(2)
+	for(int y = 0; y < img.height; ++y)
 	{
-		for(int x{0}; x < img.width; ++x)
+		for(int x = 0; x < img.width; ++x)
 		{
 			if(y >= 1)
 				index = 3 * (y * img.width + x);
