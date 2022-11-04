@@ -1,0 +1,14 @@
+[requires]
+qt/5.15.7
+
+[options]
+qt:shared=True
+
+[imports]
+#bin, *.dll -> ./src/bin
+#lib, *.dylib* -> ./src/bin
+#lib, *.so* -> ./src/bin
+
+[generators]
+cmake_find_package
+cmake_paths

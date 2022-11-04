@@ -1,0 +1,6 @@
+{
+	"name":"waterpixels",
+	"dependencies": [
+		"opencl"
+	]
+}
